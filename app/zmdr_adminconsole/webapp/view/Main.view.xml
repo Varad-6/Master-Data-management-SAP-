@@ -1,0 +1,63 @@
+<mvc:View controllerName="com.intapptics.zmdradminconsole.controller.Main"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:l="sap.ui.layout"
+    xmlns="sap.m">
+    <Page id="page" title="{i18n>title}" showFooter="true">
+        <content>
+            <IconTabBar id="idIconTabBar" expandable="false" class="sapUiResponsiveContentPadding">
+                <items>
+                    <IconTabFilter text="{i18n>tabApproveReject}" key="approveReject">
+                        <Panel class="sapUiSmallMarginTop">
+                            <headerToolbar>
+                                <OverflowToolbar>
+                                    <Title text="{i18n>panelApproveReject}" level="H4" />
+                                </OverflowToolbar>
+                            </headerToolbar>
+                            <f:SimpleForm editable="true" layout="ResponsiveGridLayout"
+                                labelSpanXL="4" labelSpanL="4" labelSpanM="4" labelSpanS="12"
+                                adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0" emptySpanM="0" emptySpanS="0"
+                                columnsXL="2" columnsL="2" columnsM="2" singleContainerFullSize="false">
+                                <f:content>
+                                    <core:Title text="" />
+                                    <Label text="{i18n>lblApplicationType}" />
+                                    <RadioButtonGroup id="appTypeGroup" columns="3" selectedIndex="0">
+                                        <buttons>
+                                            <RadioButton text="{i18n>radBulk}" />
+                                            <RadioButton text="{i18n>radCentral}" />
+                                            <RadioButton text="{i18n>radOther}" />
+                                        </buttons>
+                                    </RadioButtonGroup>
+
+                                    <Label text="{i18n>lblEntityType}" required="true" />
+                                    <ComboBox id="entityTypeCombo" selectedKey="ZMDR_ACCOUNT">
+                                        <core:Item key="ZMDR_ACCOUNT" text="{i18n>entZmdrAccount}" />
+                                        <core:Item key="ZMDR_BP_MASTER" text="{i18n>entZmdrBpMaster}" />
+                                    </ComboBox>
+
+                                    <Label text="{i18n>lblEntityNumber}" />
+                                    <Input id="entityNumberInput" />
+
+                                    <core:Title text="" />
+                                    <Label text="{i18n>lblWorkflowId}" required="true" />
+                                    <Input id="workflowIdInput" />
+
+                                    <Label text="{i18n>lblRemarks}" required="true" />
+                                    <TextArea id="remarksTextArea" maxLength="300" showExceededText="true" />
+                                </f:content>
+                            </f:SimpleForm>
+                        </Panel>
+                    </IconTabFilter>
+                </items>
+            </IconTabBar>
+        </content>
+        <footer>
+            <OverflowToolbar>
+                <ToolbarSpacer />
+                <Button text="{i18n>btnApproveWorkflow}" type="Emphasized" press=".onApprove" />
+                <Button text="{i18n>btnRejectWorkflow}" type="Emphasized" press=".onReject" />
+            </OverflowToolbar>
+        </footer>
+    </Page>
+</mvc:View>

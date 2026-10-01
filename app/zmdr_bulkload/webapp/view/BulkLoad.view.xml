@@ -1,0 +1,373 @@
+<mvc:View
+    controllerName="com.intapptics.zmdrbulkload.controller.BulkLoad"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:l="sap.ui.layout"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:u="sap.ui.unified"
+    xmlns:table="sap.ui.table"
+    xmlns:core="sap.ui.core"
+    displayBlock="true"
+    xmlns="sap.m"
+>
+    <Page
+        id="page"
+        title="{i18n>title}"
+    >
+        <content>
+            <f:Form
+                id="formUpload"
+                editable="true"
+            >
+                <f:layout>
+                    <f:ResponsiveGridLayout
+                        id="rglayoutid"
+                        labelSpanXL="4"
+                        labelSpanL="4"
+                        labelSpanM="4"
+                        labelSpanS="12"
+                        adjustLabelSpan="false"
+                        emptySpanXL="0"
+                        emptySpanL="0"
+                        emptySpanM="0"
+                        emptySpanS="0"
+                        columnsXL="3"
+                        columnsL="2"
+                        columnsM="2"
+                        singleContainerFullSize="false"
+                    />
+                </f:layout>
+                <f:formContainers>
+                    <f:FormContainer id="top_formcontainer">
+                        <f:formElements>
+                            <f:FormElement
+                                id="fe_categorylist"
+                                label="{i18n>lblCategory}"
+                            >
+                                <f:fields>
+                                    <ComboBox
+                                        id="combo_category"
+                                        items="{oUniqueCategoryModel>/}"
+                                        selectionChange="categoryChange"
+                                    >
+                                        <core:Item
+                                            id="item_category"
+                                            key="{oUniqueCategoryModel>categoryName}"
+                                            text="{oUniqueCategoryModel>categoryName}"
+                                        />
+                                    </ComboBox>
+                                </f:fields>
+                            </f:FormElement>
+                            <f:FormElement
+                                id="fe_tablelist"
+                                label="{i18n>lblTableList}"
+                            >
+                                <f:fields>
+                                    <ComboBox
+                                        id="combo_tablelist"
+                                        items="{oUniqueTableModel>/}"
+                                        selectionChange="selectedTable"
+                                        showSecondaryValues="true"
+                                    >
+                                        <core:ListItem
+                                            id="item_tablelist"
+                                            key="{oUniqueTableModel>Key}"
+                                            text="{oUniqueTableModel>TableName}"
+                                            additionalText="{oUniqueTableModel>Description}"
+                                        />
+                                    </ComboBox>
+                                    <Button
+                                        id="btn_Download"
+                                        text="{i18n>btnDownloadTemplate}"
+                                        type="Emphasized"
+                                        width="100%"
+                                        icon="sap-icon://excel-attachment"
+                                        visible="false"
+                                        press=".onTemplateDownload"
+                                    />
+                                </f:fields>
+                            </f:FormElement>
+                            <f:FormElement
+                                id="form_upload"
+                                label="{i18n>lblFile}"
+                            >
+                                <f:fields>
+                                    <u:FileUploader
+                                        id="fu_upload"
+                                        placeholder="{i18n>lblFile}"
+                                        name="myFileUpload"
+                                        uploadComplete="handleUploadComplete"
+                                        change="onFileUpload"
+                                        style="Emphasized"
+                                        fileType="XLSX, xlsx"
+                                        width="100%"
+                                        icon="sap-icon://open-folder"
+                                        tooltip="Upload the file"
+                                        uploadOnChange="false"
+                                    />
+                                </f:fields>
+                            </f:FormElement>
+                            <f:FormElement id="form_button">
+                                <f:fields>
+                                    <Button
+                                        id="btn_validate"
+                                        text="Validate Data"
+                                        icon="sap-icon://validate"
+                                        type="Emphasized"
+                                        press="handleValidateData"
+                                        class="sapUiSmallMarginEnd"
+                                    />
+                                    <Button
+                                        id="btn_reload"
+                                        text="Reload"
+                                        icon="sap-icon://refresh"
+                                        type="Emphasized"
+                                        press="handleReloadPress"
+                                    />
+                                </f:fields>
+                            </f:FormElement>
+                        </f:formElements>
+                    </f:FormContainer>
+                    <f:FormContainer id="end_formcontainer">
+                        <f:formElements>
+                            <f:FormElement id="fe_overwritenull">
+                                <f:fields>
+                                    <CheckBox
+                                        id="cb_overwritenull"
+                                        text="Overwrite with Null"
+                                        select="checkOverwriteNull"
+                                    />
+                                </f:fields>
+                            </f:FormElement>
+                            <f:FormElement id="fe_workflow">
+                                <f:fields>
+                                    <CheckBox
+                                        id="cb_workflow"
+                                        select="checkWorkflow"
+                                    />
+                                    <Input
+                                        id="inp_workflow"
+                                        enabled="false"
+                                        maxLength="10"
+                                        required="true"
+                                    />
+                                </f:fields>
+                            </f:FormElement>
+                            <f:FormElement id="fe_updatezonly">
+                                <f:fields>
+                                    <CheckBox
+                                        id="cb_updatezonly"
+                                        text="Update Z Table Only"
+                                        select="checkUpdateZOnly"
+                                    />
+                                </f:fields>
+                            </f:FormElement>
+                        </f:formElements>
+                    </f:FormContainer>
+                </f:formContainers>
+            </f:Form>
+            <ScrollContainer
+                id="sc_table"
+                height="auto"
+                width="100%"
+                vertical="true"
+            >
+                <Table
+                    id="table_validresult"
+                    items="{oHeaderDataModel>/}"
+                    contextualWidth="Auto"
+                    showSeparators="All"
+                >
+                    <headerToolbar>
+                        <Toolbar id="tb_header">
+                            <Title
+                                id="title_header"
+                                text="Validation Result"
+                            />
+                            <ToolbarSpacer id="tbs_invalidexcel" />
+                            <Button
+                                id="btn_downloadinvaliddata"
+                                text="Download Invalid Records"
+                                type="Emphasized"
+                                press="onInvalidDataExport"
+                                icon="sap-icon://excel-attachment"
+                            />
+                        </Toolbar>
+                    </headerToolbar>
+                    <columns>
+                        <Column
+                            id="col_validcount"
+                            hAlign="Center"
+                        >
+                            <Text
+                                id="txt_validcount"
+                                text="Valid Count"
+                            />
+                        </Column>
+                        <Column
+                            id="col_invalidcount"
+                            hAlign="Center"
+                        >
+                            <Text
+                                id="txt_invalidcount"
+                                text="Invalid Count"
+                            />
+                        </Column>
+                        <Column
+                            id="col_markupdate"
+                            hAlign="Center"
+                        >
+                            <Text
+                                id="txt_markupdate"
+                                text="Marked for Updation"
+                            />
+                        </Column>
+                        <Column
+                            id="col_markcreate"
+                            hAlign="Center"
+                        >
+                            <Text
+                                id="txt_markcreate"
+                                text="Marked for Creation"
+                            />
+                        </Column>
+                        <Column
+                            id="col_totalrecord"
+                            hAlign="Center"
+                        >
+                            <Text
+                                id="txt_totalrecord"
+                                text="Total Number of Records"
+                            />
+                        </Column>
+                    </columns>
+                    <items>
+                        <ColumnListItem id="cli_validresult">
+                            <cells>
+                                <Text
+                                    id="cell_validcount"
+                                    text="{oHeaderDataModel>Validcount}"
+                                    class="valid"
+                                />
+                                <Text
+                                    id="cell_invalidcount"
+                                    text="{oHeaderDataModel>Invalidcount}"
+                                    class="invalid"
+                                />
+                                <Text
+                                    id="cell_markupdate"
+                                    text="{oHeaderDataModel>Updatecount}"
+                                />
+                                <Text
+                                    id="cell_markcreate"
+                                    text="{oHeaderDataModel>Createcount}"
+                                />
+                                <Text
+                                    id="cell_totalcount"
+                                    text="{oHeaderDataModel>TotalCount}"
+                                />
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+                </Table>
+                
+                <!-- Potential Duplicates Warning MessageStrip & Table -->
+                <MessageStrip
+                    id="msgstrip_duplicates"
+                    text="⚠️ Potential duplicate records detected in database. Review and confirm before submission."
+                    type="Warning"
+                    showIcon="true"
+                    visible="false"
+                    class="sapUiSmallMarginTopBottom" />
+
+                <Table
+                    id="tbl_duplicates"
+                    items="{oDuplicateDataModel>/}"
+                    visible="false"
+                    contextualWidth="Auto"
+                    showSeparators="All"
+                    class="sapUiSmallMarginBottom">
+                    <headerToolbar>
+                        <Toolbar id="tb_duplicates_header">
+                            <Title id="title_duplicates" text="Potential Duplicates Detected (In-Batch &amp; Database — Score >= 50%)" level="H5"/>
+                        </Toolbar>
+                    </headerToolbar>
+                    <columns>
+                        <Column id="col_dup_rownum" hAlign="Center" width="80px"><Text id="txt_dup_rownum" text="Row #" /></Column>
+                        <Column id="col_dup_code" hAlign="Left" width="130px"><Text id="txt_dup_code" text="Record Key" /></Column>
+                        <Column id="col_dup_scope" hAlign="Center" width="160px"><Text id="txt_dup_scope" text="Duplicate Scope" /></Column>
+                        <Column id="col_dup_name" hAlign="Left"><Text id="txt_dup_name" text="Uploaded Name" /></Column>
+                        <Column id="col_dup_match" hAlign="Left"><Text id="txt_dup_match" text="Matched With" /></Column>
+                        <Column id="col_dup_score" hAlign="Center" width="130px"><Text id="txt_dup_score" text="Similarity Score" /></Column>
+                    </columns>
+                    <items>
+                        <ColumnListItem id="cli_duplicates">
+                            <cells>
+                                <Text id="cell_dup_rownum" text="{oDuplicateDataModel>rownumber}" />
+                                <Text id="cell_dup_code" text="{oDuplicateDataModel>code}" />
+                                <ObjectStatus 
+                                    id="cell_dup_scope"
+                                    text="{oDuplicateDataModel>scope}"
+                                    state="{= ${oDuplicateDataModel>matchType} === 'DB_FUZZY' ? 'Information' : 'Warning'}" />
+                                <Text id="cell_dup_name" text="{oDuplicateDataModel>name}" />
+                                <Text id="cell_dup_match" text="{oDuplicateDataModel>matchedWith}" />
+                                <ObjectStatus 
+                                    id="cell_dup_score"
+                                    text="{oDuplicateDataModel>score}% Match" 
+                                    state="{= ${oDuplicateDataModel>score} >= 90 ? 'Error' : 'Warning'}" />
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+                </Table>
+
+                <OverflowToolbar id="oftPagingDuplicates" visible="false" class="sapUiSmallMarginBottom">
+                    <ToolbarSpacer id="tlbspcPagingBeforeDups"></ToolbarSpacer>
+                    <OverflowToolbarButton id="btnFirstPageDups" icon="sap-icon://sys-first-page" type="Transparent" enabled="false" press="onPaginationActionDups" tooltip="First Page"></OverflowToolbarButton>
+                    <OverflowToolbarButton id="btnPrevPageDups" icon="sap-icon://sys-prev-page" type="Transparent" enabled="false" press="onPaginationActionDups" tooltip="Previous Page"></OverflowToolbarButton>
+                    <Input id="inpPageNumDups" width="50px" value="1" submit="onPaginationActionDups" tooltip="Current Page"></Input>
+                    <Label id="lblMaxPageNumDups" tooltip="Total Pages"></Label>
+                    <OverflowToolbarButton id="btnNextPageDups" icon="sap-icon://sys-next-page" type="Transparent" enabled="false" press="onPaginationActionDups" tooltip="Next Page"></OverflowToolbarButton>
+                    <OverflowToolbarButton id="btnLastPageDups" icon="sap-icon://sys-last-page" type="Transparent" enabled="false" press="onPaginationActionDups" tooltip="Last Page"></OverflowToolbarButton>
+                    <ToolbarSpacer id="tlbspcPagingAfterDups"></ToolbarSpacer>
+                    <Label id="lblPageSizeDups" text="Page Size" tooltip="Items per page"></Label>
+                    <ComboBox id="cbxPageSizeDups" selectedKey="10" selectionChange="onPaginationActionDups"  width="100px" tooltip="Items per page">
+                        <core:ListItem id="cbxPageSizeDups_10" key="10" text="10" tooltip="10"></core:ListItem>
+                        <core:ListItem id="cbxPageSizeDups_25" key="25" text="25" tooltip="25"></core:ListItem>
+                        <core:ListItem id="cbxPageSizeDups_50" key="50" text="50" tooltip="50"></core:ListItem>
+                        <core:ListItem id="cbxPageSizeDups_100" key="100" text="100" tooltip="100"></core:ListItem>
+                    </ComboBox>
+                </OverflowToolbar>
+
+                <VBox id="vbx_submit_info" class="sapUiSmallMarginTopBottom">
+                    <CheckBox
+                        id="chk_confirm_duplicates"
+                        text="I have reviewed the potential duplicate records and confirm they should be created as new records."
+                        select="onConfirmDuplicatesSelect"
+                        visible="false" />
+                    <Label
+                        id="lbl_warning"
+                        text="Click on Submit to continue with valid records"
+                        class="sapUiTinyMarginTop" />
+                </VBox>
+            </ScrollContainer>
+        </content>
+        <footer>
+            <Toolbar id="tb_footer">
+                <ToolbarSpacer id="tbs_footer" />
+                <Button
+                    id="btn_submit"
+                    type="Emphasized"
+                    icon="sap-icon://sys-enter"
+                    text="Submit"
+                    press="onSubmitDialog"
+                />
+                <Button
+                    id="btn_cancel"
+                    type="Emphasized"
+                    icon="sap-icon://sys-cancel"
+                    text="Cancel"
+                    press="onCancel"
+                />
+            </Toolbar>
+        </footer>
+    </Page>
+</mvc:View>

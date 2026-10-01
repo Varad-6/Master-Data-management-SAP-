@@ -1,0 +1,256 @@
+_schema-version: "3.1"
+ID: mdr-cap-btp
+description: A simple CAP project.
+version: 1.0.0
+modules:
+- name: mdr-cap-btp-srv
+  type: nodejs
+  path: gen/srv
+  requires:
+  - name: mdr-cap-btp-destination
+  - name: mdr-cap-btp-db
+  - name: mdr-cap-btp-auth
+  provides:
+  - name: srv-api
+    properties:
+      srv-url: ${default-url}
+  parameters:
+    buildpack: nodejs_buildpack
+    readiness-health-check-http-endpoint: /health
+    readiness-health-check-type: http
+  build-parameters:
+    builder: npm
+- name: mdr-cap-btp-db-deployer
+  type: hdb
+  path: gen/db
+  properties:
+    TARGET_CONTAINER: mdr-cap-manual-hdi
+  requires:
+  - name: mdr-cap-btp-db
+  parameters:
+    buildpack: nodejs_buildpack
+    disk-quota: 1024M
+    memory: 512M
+- name: mdr-cap-btp-approuter
+  type: approuter.nodejs
+  path: app/
+  requires:
+  - name: srv-api
+    group: destinations
+    properties:
+      forwardAuthToken: true
+      name: srv-api
+      url: ~{srv-url}
+  - name: mdr-cap-btp-auth
+  - name: mdr-btp-destination
+  - name: mdr-cap-btp-html5-runtime
+  parameters:
+    disk-quota: 512M
+    keep-existing-routes: true
+    memory: 256M
+  build-parameters:
+    ignore:
+    - zmdr_bulkload/
+    - zmdr_cntrl_main/
+    - zmdr_cntrl_cmn/
+    - zmdr_wfauditrep/
+    - zmdr_bulkapprover/
+    - zmdr_adminconsole/
+    - zmdr_account_report/
+    - node_modules/
+- name: mdr-cap-btp-ui-deployer
+  type: com.sap.application.content
+  path: ui-deployer
+  requires:
+  - name: mdr-cap-btp-html5-repo-host
+    parameters:
+      content-target: true
+  build-parameters:
+    build-result: resources
+    requires:
+    - artifacts:
+      - zmdr_cntrl_main.zip
+      name: zmdr_cntrl_main
+      target-path: resources/
+    - artifacts:
+      - zmdr_cntrl_cmn.zip
+      name: zmdr_cntrl_cmn
+      target-path: resources/
+    - artifacts:
+      - zmdr_bulkload.zip
+      name: zmdr_bulkload
+      target-path: resources/
+    - artifacts:
+      - zmdr_wfauditrep.zip
+      name: zmdr_wfauditrep
+      target-path: resources/
+    - artifacts:
+      - zmdr_bulkapprover.zip
+      name: zmdr_bulkapprover
+      target-path: resources/
+    - artifacts:
+      - comintappticszmdradminconsole.zip
+      name: comintappticszmdradminconsole
+      target-path: resources/
+    - artifacts:
+      - comintappticszmdraccountreport.zip
+      name: comintappticszmdraccountreport
+      target-path: resources/
+- name: mdr-cap-btp-destinations
+  type: com.sap.application.content
+  requires:
+  - name: mdr-cap-btp-auth
+    parameters:
+      service-key:
+        name: mdr-cap-btp-auth-key
+  - name: mdr-cap-btp-html5-repo-host
+    parameters:
+      service-key:
+        name: mdr-cap-btp-html5-repo-host-key
+  - name: srv-api
+  - name: mdr-cap-btp-destination
+    parameters:
+      content-target: true
+  parameters:
+    content:
+      subaccount:
+        destinations:
+        - Name: mdr-cap-btp-html5-repository
+          ServiceInstanceName: mdr-cap-btp-html5-repo-host
+          ServiceKeyName: mdr-cap-btp-html5-repo-host-key
+          sap.cloud.service: mdr.cap.btp
+        - Authentication: OAuth2UserTokenExchange
+          Name: mdr-cap-btp-auth
+          ServiceInstanceName: mdr-cap-manual-auth
+          ServiceKeyName: mdr-cap-btp-auth-key
+          sap.cloud.service: mdr.cap.btp
+        - Authentication: OAuth2UserTokenExchange
+          Description: CAP service backend
+          HTML5.DynamicDestination: true
+          Name: mdr.cap.btp.srv-api
+          ServiceInstanceName: mdr-cap-manual-auth
+          ServiceKeyName: mdr-cap-btp-auth-key
+          URL: ~{srv-api/srv-url}
+          WebIDEEnabled: true
+          sap.cloud.service: mdr.cap.btp
+        existing_destinations_policy: update
+  build-parameters:
+    no-source: true
+- name: zmdr_cntrl_main
+  type: html5
+  path: app/zmdr_cntrl_main
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build
+    supported-platforms: []
+- name: zmdr_cntrl_cmn
+  type: html5
+  path: app/zmdr_cntrl_cmn
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build
+    supported-platforms: []
+- name: zmdr_bulkload
+  type: html5
+  path: app/zmdr_bulkload
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build
+    supported-platforms: []
+- name: zmdr_wfauditrep
+  type: html5
+  path: app/zmdr_wfauditrep
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build
+    supported-platforms: []
+- name: zmdr_bulkapprover
+  type: html5
+  path: app/zmdr_bulkapprover
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build
+    supported-platforms: []
+- name: comintappticszmdradminconsole
+  type: html5
+  path: app/zmdr_adminconsole
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build
+    supported-platforms: []
+- name: comintappticszmdraccountreport
+  type: html5
+  path: app/zmdr_account_report
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build
+    supported-platforms: []
+resources:
+- name: mdr-cap-btp-destination
+  type: org.cloudfoundry.existing-service
+  parameters:
+    service-name: mdr-cap-manual-dest
+- name: mdr-cap-btp-db
+  type: org.cloudfoundry.existing-service
+  parameters:
+    service-name: mdr-cap-manual-hdi
+- name: mdr-cap-btp-auth
+  type: org.cloudfoundry.existing-service
+  parameters:
+    service-name: mdr-cap-manual-auth
+- name: mdr-btp-destination
+  type: org.cloudfoundry.managed-service
+  parameters:
+    config:
+      HTML5Runtime_enabled: false
+      init_data:
+        instance:
+          destinations:
+          - Authentication: NoAuthentication
+            Name: ui5
+            ProxyType: Internet
+            Type: HTTP
+            URL: https://ui5.sap.com
+          existing_destinations_policy: update
+    service: destination
+    service-plan: lite
+- name: mdr-cap-btp-html5-repo-host
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: html5-apps-repo
+    service-plan: app-host
+- name: mdr-cap-btp-html5-runtime
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: html5-apps-repo
+    service-plan: app-runtime
+parameters:
+  deploy_mode: html5-repo
+  enable-parallel-deployments: true
+build-parameters:
+  before-all:
+  - builder: custom
+    commands:
+    - npm install --omit=dev
+    - npx cds build --production

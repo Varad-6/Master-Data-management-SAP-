@@ -1,0 +1,27 @@
+default-env.json
+node_modules/
+.env
+gen/
+*.env
+dist/
+mta_archives/
+.mdr-cap-btp_mta_build_tmp
+package-lock.json
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+# added by cds
+.cdsrc-private.json
+mta_logs
+
+# developer notes (local only)
+docs/
+
+# Unused / Garbage Files
+garbage/
+*.xlsx
+*.bat
+*.sh
+node22/
+node22.zip
+*.zip

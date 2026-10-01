@@ -1,0 +1,234 @@
+{
+  "_version": "1.86.0",
+  "sap.app": {
+    "id": "com.intapptics.zmdrbulkapprover",
+    "type": "application",
+    "i18n": "i18n/i18n.properties",
+    "applicationVersion": {
+      "version": "0.0.1"
+    },
+    "title": "{{appTitle}}",
+    "description": "{{appDescription}}",
+    "resources": "resources.json",
+    "sourceTemplate": {
+      "id": "@sap/generator-fiori:basic",
+      "version": "1.30.0",
+      "toolsId": "9d69a1b6-f418-498c-935d-611b316133bb"
+    },
+    "dataSources": {
+      "mainService": {
+        "uri": "mdrapi/bulk/",
+        "type": "OData",
+        "settings": {
+          "annotations": [],
+          "odataVersion": "4.0"
+        }
+      }
+    },
+    "crossNavigation": {
+      "inbounds": {
+        "zmdr_bulkapprover-approve": {
+          "semanticObject": "bulkload",
+          "action": "approve",
+          "title": "{{zmdr_bulkapprover-approve.flpTitle}}",
+          "signature": {
+            "parameters": {},
+            "additionalParameters": "allowed"
+          }
+        }
+      }
+    }
+  },
+  "sap.ui": {
+    "technology": "UI5",
+    "icons": {
+      "icon": "",
+      "favIcon": "",
+      "phone": "",
+      "phone@2": "",
+      "tablet": "",
+      "tablet@2": ""
+    },
+    "deviceTypes": {
+      "desktop": true,
+      "tablet": true,
+      "phone": true
+    }
+  },
+  "sap.ui5": {
+    "flexEnabled": false,
+    "dependencies": {
+      "minUI5Version": "1.120.20",
+      "libs": {
+        "sap.m": {},
+        "sap.ui.core": {},
+        "sap.ui.layout": {}
+      }
+    },
+    "contentDensities": {
+      "compact": true,
+      "cozy": true
+    },
+    "models": {
+      "i18n": {
+        "type": "sap.ui.model.resource.ResourceModel",
+        "settings": {
+          "bundleName": "com.intapptics.zmdrbulkapprover.i18n.i18n",
+          "supportedLocales": ["", "en", "en_US"],
+          "fallbackLocale": ""
+        }
+      },
+      "": {
+        "dataSource": "mainService",
+        "preload": true,
+        "settings": {
+          "operationMode": "Server",
+          "autoExpandSelect": true,
+          "earlyRequests": true
+        }
+      }
+    },
+    "resources": {
+      "css": [
+        {
+          "uri": "css/style.css"
+        }
+      ]
+    },
+    "routing": {
+      "config": {
+        "routerClass": "sap.m.routing.Router",
+        "controlAggregation": "pages",
+        "controlId": "app",
+        "transition": "slide",
+        "type": "View",
+        "viewType": "XML",
+        "path": "com.intapptics.zmdrbulkapprover.view"
+      },
+      "routes": [
+        {
+          "id": "main-default",
+          "pattern": "detail/{SAPOrigin}/{AppTaskId}/{query}",
+          "name": "approvaltask",
+          "target": [
+            "main"
+          ]
+        },{
+          "name": "main",
+          "pattern": "",
+          "target": [
+            "main"
+          ]
+        }
+      ],
+      "targets": {
+        "main": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "BulkApprover",
+          "viewName": "BulkApprover"
+        }
+      }
+    },
+    "rootView": {
+      "viewName": "com.intapptics.zmdrbulkapprover.view.App",
+      "type": "XML",
+      "id": "App",
+      "async": true
+    }
+  },
+  "sap.fiori": {
+    "registrationIds": [],
+    "archeType": "transactional"
+  },
+  "sap.cloud": {
+    "public": true,
+    "service": "mdr.cap.btp"
+  },
+    "sap.bpa.task": {
+    "_version": "1.0.0",
+    "outcomes": [
+      {
+        "id": "approve",
+        "label": "Approve"
+      },
+      {
+        "id": "reject",
+        "label": "Reject"
+      }
+    ],
+    "inputs": {
+      "$schema": "http://json-schema.org/draft-07/schema",
+      "title": "input",
+      "type": "object",
+      "required": [
+        "sTablename",
+        "sWorkflowID"
+      ],
+      "properties": {
+        "sTablename": {
+          "type": "string",
+          "title": "Table Name",
+          "description": "Table Name"
+        },
+        "sWorkflowID": {
+          "type": "string",
+          "title": "Workflow Id",
+          "description": "Workflow Id"
+        },
+        "requestorName": {
+          "type": "string",
+          "title": "Requester Name",
+          "description": "Requester Name"
+        },
+        "requestorId": {
+          "type": "string",
+          "title": "Requester ID",
+          "description": "Requester ID"
+        },
+        "requestorEmail": {
+          "type": "string",
+          "title": "Requester Email",
+          "description": "Requester Email"
+        },
+        "userRemarks": {
+          "type": "string",
+          "title": "Requester Remarks",
+          "description": "Requester Remarks"
+        },
+        "operationType": {
+          "type": "string",
+          "title": "Operation Type",
+          "description": "Operation Type"
+        },
+        "category": {
+          "type": "string",
+          "title": "Category",
+          "description": "Category"
+        },
+        "tableDesc": {
+          "type": "string",
+          "title": "Table Description",
+          "description": "Table Description"
+        }
+      }
+    },
+    "outputs": {
+      "$schema": "http://json-schema.org/draft-07/schema",
+      "title": "output",
+      "type": "object",
+      "required": [
+        "comment"
+      ],
+      "properties": {
+        "comment": {
+          "type": "string",
+          "title": "Comment",
+          "description": "Approver Comment"
+        }
+      }
+    },
+    "category": "approval"
+  }
+}

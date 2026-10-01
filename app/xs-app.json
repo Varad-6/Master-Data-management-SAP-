@@ -1,0 +1,36 @@
+{
+    "welcomeFile": "/index.html",
+    "authenticationMethod": "route",
+    "routes": [
+        {
+            "source": "^/odata/v2/(.*)$",
+            "target": "/odata/v2/$1",
+            "destination": "srv-api",
+            "authenticationType": "xsuaa"
+        },
+        {
+            "source": "^/api/(.*)$",
+            "target": "/api/$1",
+            "destination": "srv-api",
+            "authenticationType": "xsuaa"
+        },
+        {
+            "source": "^/?mdrapi/(.*)$",
+            "target": "/mdrapi/$1",
+            "destination": "srv-api",
+            "authenticationType": "xsuaa"
+        },
+        {
+            "source": "^/?odata/(.*)$",
+            "target": "/odata/$1",
+            "destination": "srv-api",
+            "authenticationType": "xsuaa"
+        },
+        {
+            "source": "^(.*)$",
+            "service": "html5-apps-repo-rt",
+            "authenticationType": "xsuaa",
+            "target": "$1"
+        }
+    ]
+}

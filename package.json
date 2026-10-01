@@ -1,0 +1,98 @@
+{
+  "name": "mdr-cap-btp",
+  "version": "1.0.0",
+  "description": "A simple CAP project.",
+  "engines": {
+    "node": ">=18"
+  },
+  "repository": "<Add your repository here>",
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "@cap-js/hana": "^1",
+    "@sap-cloud-sdk/http-client": "^4.7.0",
+    "@sap/cds": "^8.2",
+    "@sap/cds-common-content": "^3.2.0",
+    "@sap/cds-dk": "^8.2",
+    "@sap/xssec": "^3",
+    "axios": "^1.16.1",
+    "express": "^4",
+    "hdb": "^2.27.1",
+    "nodemailer": "^6.10.1",
+    "passport": "^0.7.0"
+  },
+  "devDependencies": {
+    "@cap-js/sqlite": "^1",
+    "@sap/eslint-plugin-cds": "^3",
+    "cds-plugin-ui5": "^0.13.0",
+    "eslint": "^9",
+    "@sap/cds-dk": "^8.2",
+    "rimraf": "^5.0.5",
+    "mbt": "^1.2.49"
+  },
+  "scripts": {
+    "start": "cds-serve",
+    "dev": "cds watch",
+    "build": "rimraf resources mta_archives && mbt build --mtar archive",
+    "watch-zmdr_bulkload": "cds watch --open com.intapptics.zmdrbulkload/index.html?sap-ui-xx-viewCache=false --livereload false",
+    "watch-zmdr_wfauditrep": "cds watch --open com.intapptics.zmdrwfauditrep/index.html?sap-ui-xx-viewCache=false --livereload false",
+    "watch-zmdr_bulkapprover": "cds watch --open com.intapptics.zmdrbulkapprover/index.html?sap-ui-xx-viewCache=false --livereload false",
+    "watch-zmdr_adminconsole": "cds watch --open com.intapptics.zmdradminconsole/index.html?sap-ui-xx-viewCache=false --livereload false",
+    "undeploy": "cf undeploy mdr-cap-btp --delete-services --delete-service-keys --delete-service-brokers",
+    "deploy": "cf deploy mta_archives/archive.mtar --retries 1",
+    "watch-zmdr_account_report": "cds watch --open com.intapptics.zmdraccountreport/index.html?sap-ui-xx-viewCache=false --livereload false"
+  },
+  "cds": {
+    "odata": {
+      "version": "v4"
+    },
+    "requires": {
+      "[development]": {
+        "auth": {
+          "kind": "mocked"
+        },
+        "db": {
+          "kind": "sqlite",
+          "credentials": {
+            "url": "db.sqlite"
+          }
+        }
+      },
+      "[production]": {
+        "auth": {
+          "kind": "xsuaa",
+          "vcap": {
+            "label": "xsuaa"
+          }
+        },
+        "db": {
+          "kind": "hana",
+          "pool": {
+            "acquireTimeoutMillis": 2000,
+            "max": 1400,
+            "min": 100
+          }
+        }
+      },
+      "destinations": {
+        "kind": "destination",
+        "vcap": {
+          "label": "destination"
+        }
+      },
+      "html5-repo": true,
+      "workzone": true
+    },
+    "sql": {
+      "mapping": "upper"
+    }
+  },
+  "workspaces": [
+    "app/*"
+  ],
+  "sapux": [
+    "app/zmdr_wfauditrep",
+    "app/zmdr_adminconsole",
+    "app/zmdr_account_report"
+  ]
+}

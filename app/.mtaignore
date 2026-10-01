@@ -1,0 +1,6 @@
+node_modules/
+zmdr_bulkload/
+zmdr_cntrl_main/
+zmdr_cntrl_cmn/
+zmdr_wfauditrep/
+.*
